@@ -60,31 +60,24 @@
     
     // ================= MAPA DE IMÁGENES (claves en minúsculas) =================
     // Aquí van todas tus imágenes con nombres reales
-    const productImagesRaw = {
-        // Específicas primero (para que al ordenarlas tengan prioridad)
-        "body negro": "images/body negro.jpeg",
-        "boddy negro": "images/body negro.jpeg",
-        "top rosa": "images/top_rosa.jpeg",
-        "mono baggy beige": "images/mono_baggy_beige.jpeg",
-        "braga corta": "images/braga_corta.jpeg",
-        "braga larga": "images/braga_larga.jpeg",
-        "conjunto deportivo k de falda": "images/conjunto_deportivo_k_falda.jpeg",
-        "leggy": "images/leggy.jpeg",
-        "short alo": "images/short_alo.jpeg",
-        // Genéricas (se usarán si no hay coincidencia específica)
-        "body": "images/body.jpeg",
-        "top": "images/top.jpeg",
-        "mono baggy": "images/mono_baggy.jpeg",
-        "mono": "images/mono_baggy.jpeg",
-        "leggings": "images/leggings.jpeg",
-        "conjunto deportivo": "images/conjunto_deportivo.jpeg",
-        "sudaderas oversize": "images/sudadera_oversize.jpeg",
-        "sudadera oversize": "images/sudadera_oversize.jpeg",
-        "joggers": "images/joggers.jpeg",
-        "crop top": "images/crop_top.jpeg",
-        "short": "images/short.jpeg",
-        "shorts": "images/short.jpeg"
-    };
+ const productImagesRaw = {
+    // Específicas
+    "body negro": "images/Body negro.jpeg",
+    "boddy negro": "images/Body negro.jpeg",
+    "braga corta": "images/Braga corta.jpeg",
+    "braga larga": "images/Braga larga.jpeg",
+    "conjunto k de falda": "images/Conjunto K de falda.jpeg",
+    "leggy": "images/Leggy.jpeg",
+    "short alo": "images/Short alo.jpeg",
+    // Genéricas
+    "body": "images/Body negro.jpeg",
+    "top": "images/WhatsApp Image 2026-03-27 at 8.54.55 AM.jpeg", // Si tienes un top, ajusta
+    "mono baggy": "images/mono_baggy.jpg", // Si no existe, puedes agregar la imagen correspondiente
+    "leggings": "images/Braga larga.jpeg", // Ejemplo
+    "conjunto deportivo": "images/Conjunto K de falda.jpeg",
+    "short": "images/Short.jpeg",
+    "shorts": "images/Short.jpeg"
+};
     
     // Ordenar las claves de mayor a menor longitud (para priorizar las más específicas)
     const productImages = Object.fromEntries(
