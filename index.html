@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>StyleGenie - Sport & Casual AI Stylist</title>
     <style>
-        /* Mantenemos el mismo CSS anterior, solo añadimos estilos para las imágenes */
+        /* (Mantén tu CSS actual, es perfecto. Solo añado un pequeño ajuste para imágenes) */
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', system-ui, 'Segoe UI', 'Helvetica Neue', sans-serif; }
         body { background:#0a0a0a; min-height:100vh; display:flex; justify-content:center; align-items:center; padding:20px; }
         .chat-container { max-width:500px; width:100%; background:#111111; border-radius:32px; box-shadow:0 25px 45px -12px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05); overflow:hidden; display:flex; flex-direction:column; height:85vh; max-height:700px; backdrop-filter:blur(2px); }
@@ -21,6 +21,15 @@
         .bot-message { background:#1e1e1e; color:#f0f0f0; align-self:flex-start; border-bottom-left-radius:4px; border:1px solid #2a2a2a; }
         .error-message { background:#2a0f0f; color:#ff8a8a; border-left:4px solid #ff3b6f; align-self:flex-start; font-size:0.8rem; }
         .typing { background:#1a1a1a; color:#ff8aaa; align-self:flex-start; padding:12px 18px; font-style:italic; border-radius:24px; border-bottom-left-radius:4px; border:1px solid #2a2a2a; }
+        .product-image {
+            max-width: 100%;
+            border-radius: 16px;
+            margin-top: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 1px solid #2a2a2a;
+            max-height: 200px;
+            object-fit: cover;
+        }
         .input-area { display:flex; padding:15px; background:#000000; border-top:1px solid #222; gap:10px; }
         input { flex:1; padding:14px 20px; background:#1a1a1a; border:1px solid #2c2c2c; border-radius:40px; font-size:0.9rem; outline:none; transition:0.2s; color:white; }
         input:focus { border-color:#ff3b6f; box-shadow:0 0 0 2px rgba(255,59,111,0.3); background:#0f0f0f; }
@@ -30,44 +39,6 @@
         @keyframes fadeIn { from { opacity:0; transform:translateY(6px);} to { opacity:1; transform:translateY(0);} }
         .footer-note { font-size:0.7rem; text-align:center; padding:10px; background:#080808; color:#6c6c6c; border-top:1px solid #1a1a1a; letter-spacing:0.5px; }
         .footer-note strong { color:#ff3b6f; font-weight:600; }
-
-        /* Estilos para las imágenes sugeridas */
-        .suggested-products {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 8px;
-            justify-content: flex-start;
-        }
-        .product-card {
-            background: #1e1e1e;
-            border-radius: 16px;
-            overflow: hidden;
-            width: 120px;
-            text-align: center;
-            border: 1px solid #2c2c2c;
-            transition: transform 0.2s;
-        }
-        .product-card:hover {
-            transform: translateY(-4px);
-            border-color: #ff3b6f;
-        }
-        .product-card img {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
-            display: block;
-        }
-        .product-card .product-name {
-            padding: 8px 4px;
-            font-size: 0.7rem;
-            color: #fff;
-            font-weight: 500;
-            background: #00000088;
-        }
-        .bot-message .suggested-products {
-            margin-left: 0;
-        }
     </style>
 </head>
 <body>
@@ -78,7 +49,7 @@
     </div>
     <div class="messages" id="messages">
         <div class="message bot-message">
-            🧞‍♀️ ¡Hola! Soy StyleGenie. Cuéntame qué look buscas (deportivo, casual, baggy…) y tu talla. Te recomendaré outfits con imágenes.
+            🧞‍♀️ ¡Hola! Soy StyleGenie. Cuéntame qué tipo de look buscas (deportivo, casual, baggy…) y tu talla para recomendarte outfits con fotos.
         </div>
     </div>
     <div class="input-area">
@@ -91,38 +62,74 @@
 </div>
 
 <script>
-    // ================= CONFIGURACIÓN PARA GROQ =================
-    const GROQ_API_KEY = "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";   // Reemplaza con tu clave real
+    // ================= CONFIGURACIÓN =================
+    const GROQ_API_KEY = "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";   // Tu clave de Groq
     
     const API_URL = "https://api.groq.com/openai/v1/chat/completions";
     
-    // Catálogo de productos con imágenes (reemplaza con tus productos reales)
-    const CATALOGO = [
-        { nombre: "body negro", imagen: "https://via.placeholder.com/150?text=Body+Negro" },
-        { nombre: "body blanco", imagen: "https://via.placeholder.com/150?text=Body+Blanco" },
-        { nombre: "top deportivo rosa", imagen: "https://via.placeholder.com/150?text=Top+Rosa" },
-        { nombre: "top deportivo negro", imagen: "https://via.placeholder.com/150?text=Top+Negro" },
-        { nombre: "mono baggy beige", imagen: "https://via.placeholder.com/150?text=Mono+Baggy+Beige" },
-        { nombre: "mono baggy negro", imagen: "https://via.placeholder.com/150?text=Mono+Baggy+Negro" },
-        { nombre: "leggings negros", imagen: "https://via.placeholder.com/150?text=Leggings+Negros" },
-        { nombre: "leggings grises", imagen: "https://via.placeholder.com/150?text=Leggings+Grises" },
-        { nombre: "conjunto deportivo rosa", imagen: "https://via.placeholder.com/150?text=Conjunto+Rosa" },
-        { nombre: "conjunto deportivo negro", imagen: "https://via.placeholder.com/150?text=Conjunto+Negro" },
-        { nombre: "short deportivo", imagen: "https://via.placeholder.com/150?text=Short+Deportivo" },
-        { nombre: "sudera oversize", imagen: "https://via.placeholder.com/150?text=Sudera+Oversize" },
-        { nombre: "joggers", imagen: "https://via.placeholder.com/150?text=Joggers" },
-        { nombre: "crop top", imagen: "https://via.placeholder.com/150?text=Crop+Top" }
-    ];
-
-    // Prompt del sistema: ahora incluye los nombres de productos del catálogo para que los mencione
-    const SYSTEM_PROMPT = `Eres StyleGenie, asistente de moda femenina sport & casual. Tu tienda tiene estos productos: ${CATALOGO.map(p => p.nombre).join(", ")}. 
+    // ================= MAPA DE IMÁGENES LOCALES =================
+    // Asocia palabras clave (en minúsculas) con la ruta de la imagen en la carpeta /images
+    // Asegúrate de que los nombres de los archivos coincidan exactamente con lo que pongas aquí
+    const productImages = {
+        "body": "images/body.jpg",
+        "bodys": "images/body.jpg",
+        "top": "images/top.jpg",
+        "tops": "images/top.jpg",
+        "mono baggy": "images/mono_baggy.jpg",
+        "mono": "images/mono_baggy.jpg",
+        "leggings": "images/leggings.jpg",
+        "conjunto deportivo": "images/conjunto_deportivo.jpg",
+        "sudaderas oversize": "images/sudadera_oversize.jpg",
+        "sudadera oversize": "images/sudadera_oversize.jpg",
+        "joggers": "images/joggers.jpg",
+        "crop top": "images/crop_top.jpg",
+        // Agrega más según tus productos reales
+        "Braga corta": "images/braga_corta.jpeg",
+        "Braga larga": "images/braga_larga.jpeg",
+        "Conjunto deportivo K de falda": "images/conjunto_deportivo_k_falda.jpeg",
+        "Leggy": "images/leggy.jpeg",
+        "Short": "images/short.jpeg",
+        "Short alo": "images/short_alo.jpeg",
+        "Boddy negro": "images/body_negro.jpeg"
+    };  
+    
+    // Frases de saludo para no mostrar imagen en respuestas de cortesía
+    const greetingPhrases = ["hola", "buenas", "saludos", "cómo estás", "qué tal", "buenos días", "buenas tardes", "buenas noches"];
+    
+    function shouldShowImage(text) {
+        const lowerText = text.toLowerCase();
+        // Si es un saludo sin recomendación, no mostrar imagen
+        if (greetingPhrases.some(phrase => lowerText.includes(phrase) && lowerText.length < 60)) {
+            return false;
+        }
+        // Verificar si contiene alguna palabra clave de producto
+        for (let keyword of Object.keys(productImages)) {
+            if (lowerText.includes(keyword)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    function getImageForProduct(text) {
+        if (!shouldShowImage(text)) return null;
+        const lowerText = text.toLowerCase();
+        for (let [keyword, imgPath] of Object.entries(productImages)) {
+            if (lowerText.includes(keyword)) {
+                return imgPath;
+            }
+        }
+        return null;
+    }
+    
+    // Prompt del sistema (respuestas cortas y que mencionen prendas)
+    const SYSTEM_PROMPT = `Eres StyleGenie, asistente de moda femenina sport & casual. Tu tienda vende: bodys, tops, monos baggy, leggings, shorts deportivos, crop tops, sudaderas oversize, joggers, conjuntos deportivos.
 Reglas importantes:
 - RESPUESTAS MUY CORTAS: máximo 2 oraciones o 40 palabras.
-- Ve al grano: menciona 1 o 2 prendas clave de la lista anterior y por qué quedan bien.
+- Recomienda 1 o 2 prendas de tu tienda (usa palabras como body, top, mono baggy, leggings, conjunto deportivo, etc.).
 - Si falta info (talla, ocasión), pregunta en UNA oración.
 - Usa lenguaje moderno, algún emoji, pero sin alargarte.
-- No hagas listas ni expliques demasiado.
-- Siempre que recomiendes un producto, usa exactamente el nombre que aparece en la lista (por ejemplo "body negro", "mono baggy beige") para que pueda mostrarse la imagen.
+- No recomiendes productos si el usuario solo saluda.
 Ejemplo: "Para un look deportivo te recomiendo nuestro conjunto deportivo rosa. ¿Qué talla usas?".
 Responde siempre en español.`;
 
@@ -134,45 +141,7 @@ Responde siempre en español.`;
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
 
-    // Función para buscar productos en el texto y devolver los que coinciden (insensible a mayúsculas)
-    function findProductsInText(text) {
-        const lowerText = text.toLowerCase();
-        const found = [];
-        for (const product of CATALOGO) {
-            if (lowerText.includes(product.nombre.toLowerCase())) {
-                found.push(product);
-            }
-        }
-        // Eliminar duplicados por nombre
-        const unique = found.filter((p, index, self) => 
-            index === self.findIndex(t => t.nombre === p.nombre)
-        );
-        return unique;
-    }
-
-    // Función para crear el bloque de imágenes sugeridas
-    function addSuggestedImages(products) {
-        if (!products.length) return null;
-        const container = document.createElement('div');
-        container.classList.add('suggested-products');
-        products.forEach(product => {
-            const card = document.createElement('div');
-            card.classList.add('product-card');
-            const img = document.createElement('img');
-            img.src = product.imagen;
-            img.alt = product.nombre;
-            img.loading = "lazy";
-            const nameSpan = document.createElement('div');
-            nameSpan.classList.add('product-name');
-            nameSpan.textContent = product.nombre;
-            card.appendChild(img);
-            card.appendChild(nameSpan);
-            container.appendChild(card);
-        });
-        return container;
-    }
-
-    function addMessage(text, isUser = false, isError = false, products = null) {
+    function addMessage(text, isUser = false, isError = false, imageUrl = null) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message');
         if (isUser) {
@@ -182,16 +151,17 @@ Responde siempre en español.`;
         } else {
             messageDiv.classList.add('bot-message');
         }
-        messageDiv.innerHTML = text.replace(/\n/g, '<br>');
-        messagesContainer.appendChild(messageDiv);
-        
-        // Si hay productos sugeridos (solo para respuestas del bot y no error), los añadimos debajo del mensaje
-        if (!isUser && !isError && products && products.length) {
-            const imagesContainer = addSuggestedImages(products);
-            if (imagesContainer) {
-                messagesContainer.appendChild(imagesContainer);
-            }
+        const textSpan = document.createElement('div');
+        textSpan.innerHTML = text.replace(/\n/g, '<br>');
+        messageDiv.appendChild(textSpan);
+        if (imageUrl) {
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.alt = "Prenda recomendada";
+            img.classList.add('product-image');
+            messageDiv.appendChild(img);
         }
+        messagesContainer.appendChild(messageDiv);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
@@ -213,15 +183,13 @@ Responde siempre en español.`;
 
     async function getGroqResponse(userMessage) {
         conversationHistory.push({ role: "user", content: userMessage });
-
         const payload = {
             model: "llama-3.3-70b-versatile",
             messages: conversationHistory,
             temperature: 0.7,
-            max_tokens: 200,
+            max_tokens: 180,
             top_p: 0.9
         };
-
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
@@ -231,15 +199,12 @@ Responde siempre en español.`;
                 },
                 body: JSON.stringify(payload)
             });
-            
             const data = await response.json();
-
             if (!response.ok) {
                 console.error("Error en Groq API:", data);
                 addMessage(`⚠️ Error: ${data.error?.message || "No se pudo conectar"}`, false, true);
                 return "Lo siento, error técnico. ¿Intentas de nuevo?";
             }
-
             const botReply = data.choices[0].message.content;
             conversationHistory.push({ role: "assistant", content: botReply });
             return botReply;
@@ -253,24 +218,18 @@ Responde siempre en español.`;
     async function sendMessage() {
         const text = userInput.value.trim();
         if (!text) return;
-
         addMessage(text, true);
         userInput.value = '';
         userInput.focus();
-
         showTyping();
         const botResponse = await getGroqResponse(text);
         hideTyping();
-        
-        // Buscar productos mencionados en la respuesta
-        const productosEncontrados = findProductsInText(botResponse);
-        addMessage(botResponse, false, false, productosEncontrados);
+        const imgToShow = getImageForProduct(botResponse);
+        addMessage(botResponse, false, false, imgToShow);
     }
 
     sendBtn.addEventListener('click', sendMessage);
-    userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-    });
+    userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 </script>
 </body>
 </html>
