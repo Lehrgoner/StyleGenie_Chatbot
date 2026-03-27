@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>StyleGenie - Sport & Casual AI Stylist</title>
     <style>
-        /* (Mantén tu CSS actual, es perfecto. Solo añado un pequeño ajuste para imágenes) */
+        /* (Tu CSS actual, no lo modifico) */
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', system-ui, 'Segoe UI', 'Helvetica Neue', sans-serif; }
         body { background:#0a0a0a; min-height:100vh; display:flex; justify-content:center; align-items:center; padding:20px; }
         .chat-container { max-width:500px; width:100%; background:#111111; border-radius:32px; box-shadow:0 25px 45px -12px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05); overflow:hidden; display:flex; flex-direction:column; height:85vh; max-height:700px; backdrop-filter:blur(2px); }
@@ -21,15 +21,7 @@
         .bot-message { background:#1e1e1e; color:#f0f0f0; align-self:flex-start; border-bottom-left-radius:4px; border:1px solid #2a2a2a; }
         .error-message { background:#2a0f0f; color:#ff8a8a; border-left:4px solid #ff3b6f; align-self:flex-start; font-size:0.8rem; }
         .typing { background:#1a1a1a; color:#ff8aaa; align-self:flex-start; padding:12px 18px; font-style:italic; border-radius:24px; border-bottom-left-radius:4px; border:1px solid #2a2a2a; }
-        .product-image {
-            max-width: 100%;
-            border-radius: 16px;
-            margin-top: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            border: 1px solid #2a2a2a;
-            max-height: 200px;
-            object-fit: cover;
-        }
+        .product-image { max-width:100%; border-radius:16px; margin-top:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3); border:1px solid #2a2a2a; max-height:200px; object-fit:cover; }
         .input-area { display:flex; padding:15px; background:#000000; border-top:1px solid #222; gap:10px; }
         input { flex:1; padding:14px 20px; background:#1a1a1a; border:1px solid #2c2c2c; border-radius:40px; font-size:0.9rem; outline:none; transition:0.2s; color:white; }
         input:focus { border-color:#ff3b6f; box-shadow:0 0 0 2px rgba(255,59,111,0.3); background:#0f0f0f; }
@@ -63,70 +55,62 @@
 
 <script>
     // ================= CONFIGURACIÓN =================
-    const GROQ_API_KEY = "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";   // Tu clave de Groq
-    
+    const GROQ_API_KEY = "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";
     const API_URL = "https://api.groq.com/openai/v1/chat/completions";
     
-    // ================= MAPA DE IMÁGENES LOCALES =================
-    // Asocia palabras clave (en minúsculas) con la ruta de la imagen en la carpeta /images
-    // Asegúrate de que los nombres de los archivos coincidan exactamente con lo que pongas aquí
+    // ================= MAPA DE IMÁGENES LOCALES (todas las claves en minúsculas) =================
+    // IMPORTANTE: Ajusta las rutas según la extensión real de tus archivos (.jpeg o .jpg)
     const productImages = {
-        "body": "images/body.jpg",
-        "bodys": "images/body.jpg",
-        "top": "images/top.jpg",
-        "tops": "images/top.jpg",
-        "mono baggy": "images/mono_baggy.jpg",
-        "mono": "images/mono_baggy.jpg",
-        "leggings": "images/leggings.jpg",
-        "conjunto deportivo": "images/conjunto_deportivo.jpg",
-        "sudaderas oversize": "images/sudadera_oversize.jpg",
-        "sudadera oversize": "images/sudadera_oversize.jpg",
-        "joggers": "images/joggers.jpg",
-        "crop top": "images/crop_top.jpg",
-        // Agrega más según tus productos reales
-        "Braga corta": "images/braga_corta.jpeg",
-        "Braga larga": "images/braga_larga.jpeg",
-        "Conjunto deportivo K de falda": "images/conjunto_deportivo_k_falda.jpeg",
-        "Leggy": "images/leggy.jpeg",
-        "Short": "images/short.jpeg",
-        "Short alo": "images/short_alo.jpeg",
-        "Boddy negro": "images/body_negro.jpeg"
-    };  
+        "body": "images/body.jpeg",
+        "bodys": "images/body.jpeg",
+        "top": "images/top.jpeg",
+        "tops": "images/top.jpeg",
+        "mono baggy": "images/mono_baggy.jpeg",
+        "mono": "images/mono_baggy.jpeg",
+        "leggings": "images/leggings.jpeg",
+        "conjunto deportivo": "images/conjunto_deportivo.jpeg",
+        "sudaderas oversize": "images/sudadera_oversize.jpeg",
+        "sudadera oversize": "images/sudadera_oversize.jpeg",
+        "joggers": "images/joggers.jpeg",
+        "crop top": "images/crop_top.jpeg",
+        "short": "images/short.jpeg",         // Para que coincida con "shorts"
+        "shorts": "images/short.jpeg",
+        "braga corta": "images/braga_corta.jpeg",
+        "braga larga": "images/braga_larga.jpeg",
+        "conjunto deportivo k de falda": "images/conjunto_deportivo_k_falda.jpeg",
+        "leggy": "images/leggy.jpeg",
+        "short alo": "images/short_alo.jpeg",
+        "boddy negro": "images/body_negro.jpeg"
+    };
     
     // Frases de saludo para no mostrar imagen en respuestas de cortesía
     const greetingPhrases = ["hola", "buenas", "saludos", "cómo estás", "qué tal", "buenos días", "buenas tardes", "buenas noches"];
     
-    function shouldShowImage(text) {
-        const lowerText = text.toLowerCase();
-        // Si es un saludo sin recomendación, no mostrar imagen
-        if (greetingPhrases.some(phrase => lowerText.includes(phrase) && lowerText.length < 60)) {
-            return false;
-        }
-        // Verificar si contiene alguna palabra clave de producto
-        for (let keyword of Object.keys(productImages)) {
-            if (lowerText.includes(keyword)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
     function getImageForProduct(text) {
-        if (!shouldShowImage(text)) return null;
         const lowerText = text.toLowerCase();
+        
+        // 1. No mostrar imagen si es solo un saludo
+        if (greetingPhrases.some(phrase => lowerText.includes(phrase) && lowerText.length < 60)) {
+            console.log("🔍 Saludo detectado, no se mostrará imagen");
+            return null;
+        }
+        
+        // 2. Buscar coincidencia con alguna clave
         for (let [keyword, imgPath] of Object.entries(productImages)) {
             if (lowerText.includes(keyword)) {
+                console.log(`✅ Imagen encontrada: "${keyword}" → ${imgPath}`);
                 return imgPath;
             }
         }
+        console.log("❌ No se encontró ninguna palabra clave en la respuesta:", lowerText);
         return null;
     }
     
-    // Prompt del sistema (respuestas cortas y que mencionen prendas)
+    // Prompt del sistema (respuestas cortas)
     const SYSTEM_PROMPT = `Eres StyleGenie, asistente de moda femenina sport & casual. Tu tienda vende: bodys, tops, monos baggy, leggings, shorts deportivos, crop tops, sudaderas oversize, joggers, conjuntos deportivos.
 Reglas importantes:
 - RESPUESTAS MUY CORTAS: máximo 2 oraciones o 40 palabras.
-- Recomienda 1 o 2 prendas de tu tienda (usa palabras como body, top, mono baggy, leggings, conjunto deportivo, etc.).
+- Recomienda 1 o 2 prendas de tu tienda (usa palabras como body, top, mono baggy, leggings, shorts, conjunto deportivo, etc.).
 - Si falta info (talla, ocasión), pregunta en UNA oración.
 - Usa lenguaje moderno, algún emoji, pero sin alargarte.
 - No recomiendes productos si el usuario solo saluda.
@@ -159,6 +143,8 @@ Responde siempre en español.`;
             img.src = imageUrl;
             img.alt = "Prenda recomendada";
             img.classList.add('product-image');
+            img.onerror = () => console.error(`🚨 Error cargando imagen: ${imageUrl}`);
+            img.onload = () => console.log(`✅ Imagen cargada: ${imageUrl}`);
             messageDiv.appendChild(img);
         }
         messagesContainer.appendChild(messageDiv);
