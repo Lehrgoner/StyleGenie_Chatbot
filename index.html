@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>StyleGenie - Sport & Casual AI Stylist</title>
+    <style>
+        /* Mantenemos el mismo CSS anterior, solo añadimos estilos para las imágenes */
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', system-ui, 'Segoe UI', 'Helvetica Neue', sans-serif; }
+        body { background:#0a0a0a; min-height:100vh; display:flex; justify-content:center; align-items:center; padding:20px; }
+        .chat-container { max-width:500px; width:100%; background:#111111; border-radius:32px; box-shadow:0 25px 45px -12px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05); overflow:hidden; display:flex; flex-direction:column; height:85vh; max-height:700px; backdrop-filter:blur(2px); }
+        .header { background:#000000; padding:24px 20px; text-align:center; border-bottom:2px solid #ff3b6f; }
+        .header h1 { font-size:2rem; letter-spacing:-0.5px; font-weight:700; background:linear-gradient(135deg, #ffffff 0%, #ff3b6f 100%); -webkit-background-clip:text; background-clip:text; color:transparent; display:flex; align-items:center; justify-content:center; gap:8px; }
+        .header p { font-size:0.85rem; color:#aaaaaa; margin-top:8px; font-weight:500; letter-spacing:1px; }
+        .messages { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:12px; background:#0f0f0f; }
+        .messages::-webkit-scrollbar { width:5px; }
+        .messages::-webkit-scrollbar-track { background:#1e1e1e; border-radius:10px; }
+        .messages::-webkit-scrollbar-thumb { background:#ff3b6f; border-radius:10px; }
+        .message { max-width:85%; padding:12px 18px; border-radius:24px; font-size:0.9rem; line-height:1.4; animation:fadeIn 0.2s ease; }
+        .user-message { background:#ff3b6f; color:white; align-self:flex-end; border-bottom-right-radius:4px; font-weight:500; }
+        .bot-message { background:#1e1e1e; color:#f0f0f0; align-self:flex-start; border-bottom-left-radius:4px; border:1px solid #2a2a2a; }
+        .error-message { background:#2a0f0f; color:#ff8a8a; border-left:4px solid #ff3b6f; align-self:flex-start; font-size:0.8rem; }
+        .typing { background:#1a1a1a; color:#ff8aaa; align-self:flex-start; padding:12px 18px; font-style:italic; border-radius:24px; border-bottom-left-radius:4px; border:1px solid #2a2a2a; }
+        .input-area { display:flex; padding:15px; background:#000000; border-top:1px solid #222; gap:10px; }
+        input { flex:1; padding:14px 20px; background:#1a1a1a; border:1px solid #2c2c2c; border-radius:40px; font-size:0.9rem; outline:none; transition:0.2s; color:white; }
+        input:focus { border-color:#ff3b6f; box-shadow:0 0 0 2px rgba(255,59,111,0.3); background:#0f0f0f; }
+        input::placeholder { color:#6c6c6c; font-weight:400; }
+        button { background:#ff3b6f; border:none; color:white; width:48px; height:48px; border-radius:48px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s ease; font-size:1.2rem; }
+        button:hover { background:#ff1f5a; transform:scale(0.96); box-shadow:0 0 12px rgba(255,59,111,0.5); }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(6px);} to { opacity:1; transform:translateY(0);} }
+        .footer-note { font-size:0.7rem; text-align:center; padding:10px; background:#080808; color:#6c6c6c; border-top:1px solid #1a1a1a; letter-spacing:0.5px; }
+        .footer-note strong { color:#ff3b6f; font-weight:600; }
+
+        /* Estilos para las imágenes sugeridas */
+        .suggested-products {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 8px;
+            justify-content: flex-start;
+        }
+        .product-card {
+            background: #1e1e1e;
+            border-radius: 16px;
+            overflow: hidden;
+            width: 120px;
+            text-align: center;
+            border: 1px solid #2c2c2c;
+            transition: transform 0.2s;
+        }
+        .product-card:hover {
+            transform: translateY(-4px);
+            border-color: #ff3b6f;
+        }
+        .product-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            display: block;
+        }
+        .product-card .product-name {
+            padding: 8px 4px;
+            font-size: 0.7rem;
+            color: #fff;
+            font-weight: 500;
+            background: #00000088;
+        }
+        .bot-message .suggested-products {
+            margin-left: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="chat-container">
+    <div class="header">
+        <h1>✨ STYLEGENIE ✨</h1>
+        <p>SPORT & CASUAL · AI STYLIST</p>
+    </div>
+    <div class="messages" id="messages">
+        <div class="message bot-message">
+            🧞‍♀️ ¡Hola! Soy StyleGenie. Cuéntame qué look buscas (deportivo, casual, baggy…) y tu talla. Te recomendaré outfits con imágenes.
+        </div>
+    </div>
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Ej: Conjunto deportivo trendy, talla M" autofocus>
+        <button id="sendBtn">➤</button>
+    </div>
+    <div class="footer-note">
+        ⚡ Asesoría experta en <strong>bodys, tops, monos baggy, ropa deportiva</strong> · Powered by Groq
+    </div>
+</div>
+
+<script>
+    // ================= CONFIGURACIÓN PARA GROQ =================
+    const GROQ_API_KEY = "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";   // Reemplaza con tu clave real
+    
+    const API_URL = "https://api.groq.com/openai/v1/chat/completions";
+    
+    // Catálogo de productos con imágenes (reemplaza con tus productos reales)
+    const CATALOGO = [
+        { nombre: "body negro", imagen: "https://via.placeholder.com/150?text=Body+Negro" },
+        { nombre: "body blanco", imagen: "https://via.placeholder.com/150?text=Body+Blanco" },
+        { nombre: "top deportivo rosa", imagen: "https://via.placeholder.com/150?text=Top+Rosa" },
+        { nombre: "top deportivo negro", imagen: "https://via.placeholder.com/150?text=Top+Negro" },
+        { nombre: "mono baggy beige", imagen: "https://via.placeholder.com/150?text=Mono+Baggy+Beige" },
+        { nombre: "mono baggy negro", imagen: "https://via.placeholder.com/150?text=Mono+Baggy+Negro" },
+        { nombre: "leggings negros", imagen: "https://via.placeholder.com/150?text=Leggings+Negros" },
+        { nombre: "leggings grises", imagen: "https://via.placeholder.com/150?text=Leggings+Grises" },
+        { nombre: "conjunto deportivo rosa", imagen: "https://via.placeholder.com/150?text=Conjunto+Rosa" },
+        { nombre: "conjunto deportivo negro", imagen: "https://via.placeholder.com/150?text=Conjunto+Negro" },
+        { nombre: "short deportivo", imagen: "https://via.placeholder.com/150?text=Short+Deportivo" },
+        { nombre: "sudera oversize", imagen: "https://via.placeholder.com/150?text=Sudera+Oversize" },
+        { nombre: "joggers", imagen: "https://via.placeholder.com/150?text=Joggers" },
+        { nombre: "crop top", imagen: "https://via.placeholder.com/150?text=Crop+Top" }
+    ];
+
+    // Prompt del sistema: ahora incluye los nombres de productos del catálogo para que los mencione
+    const SYSTEM_PROMPT = `Eres StyleGenie, asistente de moda femenina sport & casual. Tu tienda tiene estos productos: ${CATALOGO.map(p => p.nombre).join(", ")}. 
+Reglas importantes:
+- RESPUESTAS MUY CORTAS: máximo 2 oraciones o 40 palabras.
+- Ve al grano: menciona 1 o 2 prendas clave de la lista anterior y por qué quedan bien.
+- Si falta info (talla, ocasión), pregunta en UNA oración.
+- Usa lenguaje moderno, algún emoji, pero sin alargarte.
+- No hagas listas ni expliques demasiado.
+- Siempre que recomiendes un producto, usa exactamente el nombre que aparece en la lista (por ejemplo "body negro", "mono baggy beige") para que pueda mostrarse la imagen.
+Ejemplo: "Para un look deportivo te recomiendo nuestro conjunto deportivo rosa. ¿Qué talla usas?".
+Responde siempre en español.`;
+
+    let conversationHistory = [
+        { role: "system", content: SYSTEM_PROMPT }
+    ];
+
+    const messagesContainer = document.getElementById('messages');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    // Función para buscar productos en el texto y devolver los que coinciden (insensible a mayúsculas)
+    function findProductsInText(text) {
+        const lowerText = text.toLowerCase();
+        const found = [];
+        for (const product of CATALOGO) {
+            if (lowerText.includes(product.nombre.toLowerCase())) {
+                found.push(product);
+            }
+        }
+        // Eliminar duplicados por nombre
+        const unique = found.filter((p, index, self) => 
+            index === self.findIndex(t => t.nombre === p.nombre)
+        );
+        return unique;
+    }
+
+    // Función para crear el bloque de imágenes sugeridas
+    function addSuggestedImages(products) {
+        if (!products.length) return null;
+        const container = document.createElement('div');
+        container.classList.add('suggested-products');
+        products.forEach(product => {
+            const card = document.createElement('div');
+            card.classList.add('product-card');
+            const img = document.createElement('img');
+            img.src = product.imagen;
+            img.alt = product.nombre;
+            img.loading = "lazy";
+            const nameSpan = document.createElement('div');
+            nameSpan.classList.add('product-name');
+            nameSpan.textContent = product.nombre;
+            card.appendChild(img);
+            card.appendChild(nameSpan);
+            container.appendChild(card);
+        });
+        return container;
+    }
+
+    function addMessage(text, isUser = false, isError = false, products = null) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message');
+        if (isUser) {
+            messageDiv.classList.add('user-message');
+        } else if (isError) {
+            messageDiv.classList.add('error-message');
+        } else {
+            messageDiv.classList.add('bot-message');
+        }
+        messageDiv.innerHTML = text.replace(/\n/g, '<br>');
+        messagesContainer.appendChild(messageDiv);
+        
+        // Si hay productos sugeridos (solo para respuestas del bot y no error), los añadimos debajo del mensaje
+        if (!isUser && !isError && products && products.length) {
+            const imagesContainer = addSuggestedImages(products);
+            if (imagesContainer) {
+                messagesContainer.appendChild(imagesContainer);
+            }
+        }
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    let typingIndicator = null;
+    function showTyping() {
+        if (typingIndicator) return;
+        typingIndicator = document.createElement('div');
+        typingIndicator.classList.add('message', 'typing');
+        typingIndicator.innerText = '✨ StyleGenie piensa... ✨';
+        messagesContainer.appendChild(typingIndicator);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    function hideTyping() {
+        if (typingIndicator) {
+            typingIndicator.remove();
+            typingIndicator = null;
+        }
+    }
+
+    async function getGroqResponse(userMessage) {
+        conversationHistory.push({ role: "user", content: userMessage });
+
+        const payload = {
+            model: "llama-3.3-70b-versatile",
+            messages: conversationHistory,
+            temperature: 0.7,
+            max_tokens: 200,
+            top_p: 0.9
+        };
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${GROQ_API_KEY}`
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Error en Groq API:", data);
+                addMessage(`⚠️ Error: ${data.error?.message || "No se pudo conectar"}`, false, true);
+                return "Lo siento, error técnico. ¿Intentas de nuevo?";
+            }
+
+            const botReply = data.choices[0].message.content;
+            conversationHistory.push({ role: "assistant", content: botReply });
+            return botReply;
+        } catch (error) {
+            console.error("Error de red:", error);
+            addMessage(`⚠️ Error de conexión: ${error.message}`, false, true);
+            return "Error de red. Revisa tu internet.";
+        }
+    }
+
+    async function sendMessage() {
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        addMessage(text, true);
+        userInput.value = '';
+        userInput.focus();
+
+        showTyping();
+        const botResponse = await getGroqResponse(text);
+        hideTyping();
+        
+        // Buscar productos mencionados en la respuesta
+        const productosEncontrados = findProductsInText(botResponse);
+        addMessage(botResponse, false, false, productosEncontrados);
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+</script>
+</body>
+</html>
