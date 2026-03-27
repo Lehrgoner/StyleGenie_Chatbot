@@ -58,13 +58,22 @@
     const GROQ_API_KEY = "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";
     const API_URL = "https://api.groq.com/openai/v1/chat/completions";
     
-    // ================= MAPA DE IMÁGENES LOCALES (todas las claves en minúsculas) =================
-    // IMPORTANTE: Ajusta las rutas según la extensión real de tus archivos (.jpeg o .jpg)
-    const productImages = {
+    // ================= MAPA DE IMÁGENES (claves en minúsculas) =================
+    // Aquí van todas tus imágenes con nombres reales
+    const productImagesRaw = {
+        // Específicas primero (para que al ordenarlas tengan prioridad)
+        "body negro": "images/body_negro.jpeg",
+        "boddy negro": "images/body_negro.jpeg",
+        "top rosa": "images/top_rosa.jpeg",
+        "mono baggy beige": "images/mono_baggy_beige.jpeg",
+        "braga corta": "images/braga_corta.jpeg",
+        "braga larga": "images/braga_larga.jpeg",
+        "conjunto deportivo k de falda": "images/conjunto_deportivo_k_falda.jpeg",
+        "leggy": "images/leggy.jpeg",
+        "short alo": "images/short_alo.jpeg",
+        // Genéricas (se usarán si no hay coincidencia específica)
         "body": "images/body.jpeg",
-        "bodys": "images/body.jpeg",
         "top": "images/top.jpeg",
-        "tops": "images/top.jpeg",
         "mono baggy": "images/mono_baggy.jpeg",
         "mono": "images/mono_baggy.jpeg",
         "leggings": "images/leggings.jpeg",
@@ -73,15 +82,14 @@
         "sudadera oversize": "images/sudadera_oversize.jpeg",
         "joggers": "images/joggers.jpeg",
         "crop top": "images/crop_top.jpeg",
-        "short": "images/short.jpeg",         // Para que coincida con "shorts"
-        "shorts": "images/short.jpeg",
-        "braga corta": "images/braga_corta.jpeg",
-        "braga larga": "images/braga_larga.jpeg",
-        "conjunto deportivo k de falda": "images/conjunto_deportivo_k_falda.jpeg",
-        "leggy": "images/leggy.jpeg",
-        "short alo": "images/short_alo.jpeg",
-        "boddy negro": "images/body_negro.jpeg"
+        "short": "images/short.jpeg",
+        "shorts": "images/short.jpeg"
     };
+    
+    // Ordenar las claves de mayor a menor longitud (para priorizar las más específicas)
+    const productImages = Object.fromEntries(
+        Object.entries(productImagesRaw).sort((a, b) => b[0].length - a[0].length)
+    );
     
     // Frases de saludo para no mostrar imagen en respuestas de cortesía
     const greetingPhrases = ["hola", "buenas", "saludos", "cómo estás", "qué tal", "buenos días", "buenas tardes", "buenas noches"];
@@ -89,13 +97,13 @@
     function getImageForProduct(text) {
         const lowerText = text.toLowerCase();
         
-        // 1. No mostrar imagen si es solo un saludo
+        // No mostrar imagen si es solo un saludo
         if (greetingPhrases.some(phrase => lowerText.includes(phrase) && lowerText.length < 60)) {
             console.log("🔍 Saludo detectado, no se mostrará imagen");
             return null;
         }
         
-        // 2. Buscar coincidencia con alguna clave
+        // Buscar coincidencia con claves (ya ordenadas por longitud descendente)
         for (let [keyword, imgPath] of Object.entries(productImages)) {
             if (lowerText.includes(keyword)) {
                 console.log(`✅ Imagen encontrada: "${keyword}" → ${imgPath}`);
