@@ -264,16 +264,24 @@
     // ================= MAPA DE IMÁGENES =================
     const productImagesRaw = {
         // Específicas (más largas primero)
+        "conjunto deportivo rosa": "images/conjunto_deportivo_rosa.jpeg",
         "body negro": "images/body_negro.jpeg",
-        "boddy negro": "images/body_negro.jpeg",
         "braga corta": "images/braga_corta.jpeg",
         "braga larga": "images/braga_larga.jpeg",
+        "braga larga negra": "images/braga_largar_negra.jpeg",
         "conjunto k de falda": "images/conjunto_k_falda.jpeg",
         "leggy": "images/leggy.jpeg",
         "short alo": "images/short_alo.jpeg",
+        "set 2 piezas alo": "images/set_2_piezas_alo.jpeg",
+        "body blanco": "images/body_blanco.jpeg",
+        "body blanco manga larga": "images/body_blanco_manga_larga.jpeg",
+        "body straple": "images/body_straple.jpeg",
+        "braga larga manga corta": "images/braga_larga_manga_corta.jpeg",
+        
         // Genéricas
         "body": "images/body_negro.jpeg",
-        "lau": "images/lau.jpeg",
+        "top": "images/top_negro.jpeg",
+        "maria": "images/maria.jpeg",
         "nathaly": "images/nathaly.jpeg",
         "braga": "images/braga_corta.jpeg",
         "bragas": "images/braga_corta.jpeg",
@@ -285,10 +293,10 @@
 
     // Grupos de variantes (si se detecta una genérica, se añaden las específicas)
     const productVariants = {
-        "braga": ["braga corta", "braga larga"],
-        "body": ["body negro"],
+        "braga": ["braga corta", "braga larga", "braga larga manga corta"],
+        "body": ["body negro", "body straple", "body blanco"],
         "short": ["short alo", "short"],
-        "top": []   // si tuvieras tops específicos
+        "top": [ "top"]   // si tuvieras tops específicos
     };
 
     // Ordenar claves por longitud descendente (prioriza las más específicas)
@@ -357,18 +365,38 @@
     }
 
     // ================= PROMPT DEL SISTEMA =================
-    const SYSTEM_PROMPT = `Eres StyleGenie, asistente de moda femenina sport & casual. Tu tienda vende: bodys, tops, monos baggy, leggings, braga, lau, nathaly, shorts deportivos, crop tops, sudaderas oversize, joggers, conjuntos deportivos. No tenemos tienda fisica solo virtual el instagram es @style.genie pero por hoy estaremos en la feria del emprendimiento de la URBE desde las 5:00 pm
+    const SYSTEM_PROMPT = `Eres StyleGenie, asistente de moda femenina sport & casual. Tu tienda vende: bodys, tops, monos baggy, leggings, braga, marira, nathaly, shorts deportivos, crop tops, sudaderas oversize, joggers, conjuntos deportivos. No tenemos tienda fisica solo virtual el instagram es @style.genie pero por hoy estaremos en la feria del emprendimiento de la URBE desde las 5:00 pm
 Reglas importantes:
 - RESPUESTAS MUY CORTAS: máximo 2 oraciones o 40 palabras.
 - Recomienda 1 o 2 prendas de tu tienda (usa palabras como body, top, mono baggy, leggings, shorts, conjunto deportivo,, braga, lau, nathaly, etc.).
 - Si falta info (talla, ocasión), pregunta en UNA oración.
 - Usa lenguaje moderno, algún emoji, pero sin alargarte.
 - No recomiendes productos si el usuario solo saluda, pero pregunta como puedes ayudarlo.
-- Si te preguntan por el precio en bs o bolivares, haz la conversion 1$ = 540 bs o bolivares.
+- Si te preguntan por el precio en bs o bolivares, haz la conversion 1$ = 600 bs o bolivares.
 - Para retiros diles que se contacten al WhatsApp +58 4246882025.
 - No procesas pagos, diles que para coordinar el pago escriban al WhatsApp o a la cuenta de instagram.
-- Si te preguntan por la tienda menciona la cuenta de Instagram
-- Si te preguntan por nathaly, ella es nuestra modelo (y les muestras la imagen nathaly.jpeg)
+- Si te preguntan por la tienda menciona la cuenta de Instagram.
+- Si te preguntan por nathaly, ella es nuestra modelo estrella.
+- Si te preguntan por maria, ella es nuestra modelo motera.
+- Esta es la lista de precios, da el precio si te preguntan:
+        Lista de precios
+        
+        top negro 10$
+        body straple 7$
+        body blanco 20$
+        Bodys manga larga 10$
+        braga larga 27$
+        braga 18$
+        buzo 12$
+        body negro 10$
+        Braga larga gris 20$
+        leggin 10$
+        short alo 8$
+        braga corta 18$
+        conjunto deportivo K de falda 18$
+        Braga corta manga larga anaranjado 18$
+        set 2 piezas alo 25$
+        conjunto Deportivo rosa 27$
 Ejemplo: "Para un look deportivo te recomiendo nuestro conjunto deportivo rosa. ¿Qué talla usas?".
 Responde siempre en español.`;
 
